@@ -140,3 +140,72 @@ body {
 .dialog button.no {
   background: #444b5c;
 }
+
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffd54d;
+  color: #1a1e26;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: bold;
+  z-index: 20;
+  animation: toast-pop 4s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes toast-pop {
+  0% { opacity: 0; transform: translateX(-50%) translateY(-16px) scale(0.9); }
+  8% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1.05); }
+  12% { transform: translateX(-50%) scale(1); }
+  85% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+#journal-btn {
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #6a4fb3;
+  color: white;
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.dialog.journal {
+  max-width: 520px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.cards {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card {
+  background: #303748;
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.card p {
+  font-size: 14px;
+  line-height: 1.45;
+}
