@@ -209,3 +209,12 @@ body {
   font-size: 14px;
   line-height: 1.45;
 }
+
+#title {
+  font-size: 22px;
+  text-align: center;
+  background: linear-gradient(90deg, #ffd54d, #f06c24, #3f76d4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
