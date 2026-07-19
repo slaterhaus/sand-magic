@@ -5,6 +5,7 @@ import { stepPhysics } from './engine/physics';
 import { stepReactions } from './engine/reactions';
 import { Renderer } from './render';
 import { attachPainting, type Controls } from './ui/input';
+import { buildControls } from './ui/palette';
 
 const grid = new Grid(400, 250);
 const canvas = document.querySelector<HTMLCanvasElement>('#world')!;
@@ -13,6 +14,10 @@ const controls: Controls = { element: SAND, radius: 4, paused: false };
 const seen = new Set<string>();
 
 attachPainting(canvas, grid, controls);
+buildControls(
+  document.querySelector<HTMLElement>('#controls')!,
+  grid, controls, simulate,
+);
 
 function simulate(): void {
   stepPhysics(grid);
