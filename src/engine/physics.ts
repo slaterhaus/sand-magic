@@ -24,7 +24,9 @@ function updateCell(grid: Grid, x: number, y: number, random: Rng): void {
   if (def.decay && decayCell(grid, i, def, random)) return;
 
   if (def.phase === 'powder') movePowder(grid, x, y, def, random);
-  // liquid and gas movement arrive in the next task; static never moves
+  else if (def.phase === 'liquid') moveLiquid(grid, x, y, def, random);
+  else if (def.phase === 'gas') moveGas(grid, x, y, def, random);
+  // static never moves
 }
 
 function decayCell(grid: Grid, i: number, def: ElementDef, random: Rng): boolean {
@@ -43,6 +45,25 @@ function movePowder(grid: Grid, x: number, y: number, def: ElementDef, random: R
   const dir = random() < 0.5 ? 1 : -1;
   if (tryMove(grid, x, y, x + dir, y + 1, def)) return;
   tryMove(grid, x, y, x - dir, y + 1, def);
+}
+
+function moveLiquid(grid: Grid, x: number, y: number, def: ElementDef, random: Rng): void {
+  // gooey liquids (lava) skip most turns
+  if ((def.flowChance ?? 1) < random()) return;
+  if (tryMove(grid, x, y, x, y + 1, def)) return;
+  const dir = random() < 0.5 ? 1 : -1;
+  if (tryMove(grid, x, y, x + dir, y + 1, def)) return;
+  if (tryMove(grid, x, y, x - dir, y + 1, def)) return;
+  if (tryMove(grid, x, y, x + dir, y, def, true)) return;
+  tryMove(grid, x, y, x - dir, y, def, true);
+}
+
+function moveGas(grid: Grid, x: number, y: number, def: ElementDef, random: Rng): void {
+  if (tryMove(grid, x, y, x, y - 1, def)) return;
+  const dir = random() < 0.5 ? 1 : -1;
+  if (tryMove(grid, x, y, x + dir, y - 1, def)) return;
+  if (tryMove(grid, x, y, x - dir, y - 1, def)) return;
+  if (random() < 0.5) tryMove(grid, x, y, x + dir, y, def, true);
 }
 
 // Move (x,y) → (nx,ny). Into EMPTY: always. Into liquid/gas: displacement
