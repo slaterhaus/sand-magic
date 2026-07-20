@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import type { Discovery } from '../src/engine/reactions';
+import { LAVA, WATER } from '../src/elements';
+import { Grid } from '../src/engine/grid';
+import { stepReactions, type Discovery } from '../src/engine/reactions';
 import { Journal, type StorageLike } from '../src/ui/journal';
 
 const fakeStorage = (initial: Record<string, string> = {}): StorageLike & { data: Record<string, string> } => ({
@@ -51,5 +53,19 @@ describe('Journal', () => {
     const j = new Journal(broken);
     j.record(obsidian); // must not throw
     expect(j.entries.length).toBe(1);
+  });
+
+  it('persists a discovery through the real stepReactions wiring (main.ts pattern)', () => {
+    const storage = fakeStorage();
+    const journal = new Journal(storage);
+    const g = new Grid(4, 2);
+    g.set(0, 0, LAVA);
+    g.set(1, 0, WATER);
+
+    stepReactions(g, journal.seen, d => { journal.record(d); }, () => 0);
+
+    expect(journal.entries.length).toBe(1);
+    expect(journal.entries[0].name).toBe('Obsidian!');
+    expect(JSON.parse(storage.data['sand-magic-journal'])).toEqual(journal.entries);
   });
 });

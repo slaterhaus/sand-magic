@@ -50,7 +50,8 @@ describe('reactions', () => {
     g.set(4, 0, WATER);
     const seen = new Set<string>();
     const events: Discovery[] = [];
-    stepReactions(g, seen, d => events.push(d), rngZero);
+    const onDiscovery = (d: Discovery): void => { seen.add(d.name); events.push(d); };
+    stepReactions(g, seen, onDiscovery, rngZero);
     expect(events.length).toBe(1);
     expect(events[0].name).toBe('Obsidian!');
     expect(events[0].science).toContain('lava');
@@ -58,7 +59,7 @@ describe('reactions', () => {
     // refill and react again — no second event
     g.set(0, 1, LAVA);
     g.set(1, 1, WATER);
-    stepReactions(g, seen, d => events.push(d), rngZero);
+    stepReactions(g, seen, onDiscovery, rngZero);
     expect(events.length).toBe(1);
   });
 });

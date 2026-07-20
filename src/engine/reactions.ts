@@ -59,7 +59,6 @@ function tryReact(
   grid.set(x, y, rule.aBecomes);
   grid.set(nx, ny, rule.bBecomes);
   if (rule.discovery && !seen.has(rule.discovery.name)) {
-    seen.add(rule.discovery.name);
     onDiscovery({ ...rule.discovery, swatches: rule.swatches });
   }
 }
