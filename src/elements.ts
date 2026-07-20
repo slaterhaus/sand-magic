@@ -39,6 +39,15 @@ export interface ElementDef {
     altInto?: ElementId;   // sometimes becomes this instead...
     altChance?: number;    // ...with this probability (fire leaves ash)
   };
+  growsInto?: {          // static elements only: grows a copy of itself upward
+    into: ElementId;
+    chance: number;       // per-frame chance to grow, if not yet at maxHeight
+    maxHeight: number;    // caps how many segments tall it can grow
+  };
+  condenseNearTop?: {    // gases only: condenses back to a liquid near the top
+    into: ElementId;
+    rowFraction: number;  // fraction of grid height counted as "the top"
+  };
 }
 
 export const ELEMENTS: Record<ElementId, ElementDef> = {
@@ -51,9 +60,10 @@ export const ELEMENTS: Record<ElementId, ElementDef> = {
                 decay: { after: 60, into: EMPTY, altInto: ASH, altChance: 0.1 } },
   [WOOD]:     { id: WOOD, name: 'Wood', colors: ['#7a5230', '#6e4a2b', '#835a36'], phase: 'static', density: 9999 },
   [SEED]:     { id: SEED, name: 'Seed', colors: ['#a4d04a'], phase: 'powder', density: 1100 },
-  [PLANT]:    { id: PLANT, name: 'Plant', colors: ['#3e9d3e', '#46ac46', '#358a35'], phase: 'static', density: 9999 },
+  [PLANT]:    { id: PLANT, name: 'Plant', colors: ['#3e9d3e', '#46ac46', '#358a35'], phase: 'static', density: 9999,
+                growsInto: { into: PLANT, chance: 0.03, maxHeight: 6 } },
   [STEAM]:    { id: STEAM, name: 'Steam', colors: ['#c9d4dd', '#bcc8d2'], phase: 'gas', density: 1,
-                decay: { after: 300, into: WATER } },  // steam cools back into rain!
+                condenseNearTop: { into: WATER, rowFraction: 0.15 } },  // steam cools back into rain near the top!
   [ICE]:      { id: ICE, name: 'Ice', colors: ['#aee1f5', '#9fd6ee'], phase: 'static', density: 9999 },
   [OIL]:      { id: OIL, name: 'Oil', colors: ['#4b3a5a', '#544166'], phase: 'liquid', density: 900 },
   [ASH]:      { id: ASH, name: 'Ash', colors: ['#9b9b93', '#8f8f88'], phase: 'powder', density: 700 },

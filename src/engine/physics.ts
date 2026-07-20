@@ -14,6 +14,8 @@ export function stepPhysics(grid: Grid, random: Rng = Math.random): void {
   }
 }
 
+const CONDENSE_CHANCE = 0.05;
+
 function updateCell(grid: Grid, x: number, y: number, random: Rng): void {
   const i = grid.index(x, y);
   if (grid.moved[i]) return;
@@ -22,11 +24,37 @@ function updateCell(grid: Grid, x: number, y: number, random: Rng): void {
   const def = ELEMENTS[id];
 
   if (def.decay && decayCell(grid, i, def, random)) return;
+  if (def.condenseNearTop && condenseCell(grid, i, x, y, def, random)) return;
 
   if (def.phase === 'powder') movePowder(grid, x, y, def, random);
   else if (def.phase === 'liquid') moveLiquid(grid, x, y, def, random);
   else if (def.phase === 'gas') moveGas(grid, x, y, def, random);
   // static never moves
+
+  if (def.growsInto) growCell(grid, i, x, y, def, random);
+}
+
+function condenseCell(
+  grid: Grid, i: number, x: number, y: number, def: ElementDef, random: Rng,
+): boolean {
+  const c = def.condenseNearTop!;
+  if (y >= grid.height * c.rowFraction) return false;
+  if (random() >= CONDENSE_CHANCE) return false;
+  grid.set(x, y, c.into);
+  grid.moved[i] = 1;
+  return true;
+}
+
+function growCell(grid: Grid, i: number, x: number, y: number, def: ElementDef, random: Rng): void {
+  const g = def.growsInto!;
+  if (grid.life[i] >= g.maxHeight) return;
+  if (random() >= g.chance) return;
+  const ny = y - 1;
+  if (!grid.inBounds(x, ny)) return;
+  if (grid.cells[grid.index(x, ny)] !== EMPTY) return;
+  const nextLife = grid.life[i] + 1;
+  grid.set(x, ny, g.into);
+  grid.life[grid.index(x, ny)] = nextLife;
 }
 
 function decayCell(grid: Grid, i: number, def: ElementDef, random: Rng): boolean {
