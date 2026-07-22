@@ -38,6 +38,7 @@ body {
   border-radius: 8px;
   cursor: crosshair;
   image-rendering: pixelated;
+  touch-action: none;
 }
 
 .palette {
@@ -272,4 +273,28 @@ body {
 
 .mute-btn:hover {
   background: #303748;
+}
+
+@media (max-width: 768px) {
+  #app {
+    flex-direction: column;
+  }
+
+  #stage {
+    flex: 0 0 55%;
+    order: -1;
+  }
+
+  #controls {
+    flex: 1;
+    width: auto;
+    overflow-y: auto;
+  }
+
+  .element-btn,
+  .buttons button,
+  #journal-btn,
+  .mute-btn {
+    min-height: 44px;
+  }
 }

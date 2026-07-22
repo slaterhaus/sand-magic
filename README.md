@@ -1,4 +1,4 @@
-# Sand Magic ✨
+# Science Magic ✨
 
 A falling-sand science playground. Paint sand, water, lava, fire and more —
 watch real physics happen, and collect surprise discoveries in your journal.
