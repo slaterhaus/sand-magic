@@ -7,6 +7,7 @@ import { Renderer } from './render';
 import { attachPainting, type Controls } from './ui/input';
 import { buildControls } from './ui/palette';
 import { buildJournalUI, Journal, showToast } from './ui/journal';
+import { buildTitleScreen } from './ui/titlescreen';
 
 const grid = new Grid(400, 250);
 const canvas = document.querySelector<HTMLCanvasElement>('#world')!;
@@ -20,6 +21,7 @@ buildControls(
   grid, controls, simulate,
 );
 buildJournalUI(document.querySelector<HTMLElement>('#controls')!, journal);
+buildTitleScreen(document.body);
 
 function simulate(): void {
   stepPhysics(grid);
