@@ -12,7 +12,7 @@ export const LAVA = 4;
 export const FIRE = 5;
 export const WOOD = 6;
 export const SEED = 7;
-export const PLANT = 8;
+export const GRASS = 8;   // was PLANT — the common sprout outcome
 export const STEAM = 9;
 export const ICE = 10;
 export const OIL = 11;
@@ -24,6 +24,9 @@ export const DIRT = 16;
 export const ACID = 17;
 export const GLASS = 18;
 export const RUST = 19;
+export const SHRUB = 20;
+export const FLOWER = 21;
+export const TREE = 22;
 
 // How an element moves:
 //  static = never moves (stone, wood, ice...)
@@ -66,8 +69,8 @@ export const ELEMENTS: Record<ElementId, ElementDef> = {
                 decay: { after: 60, into: EMPTY, altInto: ASH, altChance: 0.1 } },
   [WOOD]:     { id: WOOD, name: 'Wood', colors: ['#7a5230', '#6e4a2b', '#835a36'], phase: 'static', density: 9999 },
   [SEED]:     { id: SEED, name: 'Seed', colors: ['#a4d04a'], phase: 'powder', density: 1100 },
-  [PLANT]:    { id: PLANT, name: 'Plant', colors: ['#3e9d3e', '#46ac46', '#358a35'], phase: 'static', density: 9999,
-                growsInto: { into: PLANT, chance: 0.03, maxHeight: 6 } },
+  [GRASS]:    { id: GRASS, name: 'Grass', colors: ['#3e9d3e', '#46ac46', '#358a35'], phase: 'static', density: 9999,
+                growsInto: { into: GRASS, chance: 0.03, maxHeight: 4 } },
   [STEAM]:    { id: STEAM, name: 'Steam', colors: ['#c9d4dd', '#bcc8d2'], phase: 'gas', density: 1,
                 condenseNearTop: { into: WATER, rowFraction: 0.15 } },  // steam cools back into rain near the top!
   [ICE]:      { id: ICE, name: 'Ice', colors: ['#aee1f5', '#9fd6ee'], phase: 'static', density: 9999 },
@@ -80,6 +83,12 @@ export const ELEMENTS: Record<ElementId, ElementDef> = {
   [ACID]:     { id: ACID, name: 'Acid', colors: ['#7ee62c', '#6fd420'], phase: 'liquid', density: 1050 },
   [GLASS]:    { id: GLASS, name: 'Glass', colors: ['#bcd6d6', '#a9c9c9'], phase: 'static', density: 9999 },
   [RUST]:     { id: RUST, name: 'Rust', colors: ['#8a4a2a', '#7a3f22'], phase: 'static', density: 9999 },
+  [SHRUB]:    { id: SHRUB, name: 'Shrub', colors: ['#2f6b3a', '#275a30'], phase: 'static', density: 9999,
+                growsInto: { into: SHRUB, chance: 0.03, maxHeight: 5 } },
+  [FLOWER]:   { id: FLOWER, name: 'Flower', colors: ['#3e9d3e', '#e85d9c', '#f0c445', '#9a6fd6'], phase: 'static', density: 9999,
+                growsInto: { into: FLOWER, chance: 0.03, maxHeight: 5 } },
+  [TREE]:     { id: TREE, name: 'Tree', colors: ['#4a3420', '#3d2a18'], phase: 'static', density: 9999,
+                growsInto: { into: TREE, chance: 0.03, maxHeight: 10 } },
 };
 
 // When element `a` touches element `b`, `a` becomes `aBecomes` and
@@ -104,6 +113,13 @@ export interface Reaction {
   discovery?: { name: string; science: string };
 }
 
+const SPROUT_OUTCOMES: WeightedOutcome[] = [
+  { into: GRASS, weight: 50 },
+  { into: SHRUB, weight: 30 },
+  { into: FLOWER, weight: 15 },
+  { into: TREE, weight: 5 },
+];
+
 export const REACTIONS: Reaction[] = [
   { a: LAVA, b: WATER, aBecomes: OBSIDIAN, bBecomes: STEAM, chance: 0.9,
     discovery: { name: 'Obsidian!', science: 'When lava touches water it cools in an instant into shiny black volcanic glass. Brand-new islands are born this way!' } },
@@ -117,10 +133,20 @@ export const REACTIONS: Reaction[] = [
     discovery: { name: 'Oil Fire', science: 'Oil catches fire much faster than wood — and it floats on water, so an oil fire can burn right on top of a lake!' } },
   { a: LAVA, b: OIL, aBecomes: LAVA, bBecomes: FIRE, chance: 0.6,
     discovery: { name: 'Oil Fire', science: 'Oil catches fire much faster than wood — and it floats on water, so an oil fire can burn right on top of a lake!' } },
-  { a: FIRE, b: PLANT, aBecomes: FIRE, bBecomes: FIRE, chance: 0.06 },
-  { a: SEED, b: WATER, aBecomes: PLANT, bBecomes: PLANT, chance: 1,
+  { a: FIRE, b: GRASS, aBecomes: FIRE, bBecomes: FIRE, chance: 0.06 },
+  { a: FIRE, b: SHRUB, aBecomes: FIRE, bBecomes: FIRE, chance: 0.06 },
+  { a: FIRE, b: FLOWER, aBecomes: FIRE, bBecomes: FIRE, chance: 0.06 },
+  { a: FIRE, b: TREE, aBecomes: FIRE, bBecomes: FIRE, chance: 0.02 },
+  { a: LAVA, b: TREE, aBecomes: LAVA, bBecomes: FIRE, chance: 0.02 },
+  { a: SEED, b: WATER, aBecomes: SPROUT_OUTCOMES, bBecomes: WATER, chance: 1,
     discovery: { name: 'Sprout!', science: 'Seeds drink up water to sprout and grow. Plants build themselves mostly out of water and air!' } },
-  { a: PLANT, b: WATER, aBecomes: PLANT, bBecomes: PLANT, chance: 0.02,
+  { a: GRASS, b: WATER, aBecomes: GRASS, bBecomes: GRASS, chance: 0.02,
+    discovery: { name: 'Sprout!', science: 'Seeds drink up water to sprout and grow. Plants build themselves mostly out of water and air!' } },
+  { a: SHRUB, b: WATER, aBecomes: SHRUB, bBecomes: SHRUB, chance: 0.02,
+    discovery: { name: 'Sprout!', science: 'Seeds drink up water to sprout and grow. Plants build themselves mostly out of water and air!' } },
+  { a: FLOWER, b: WATER, aBecomes: FLOWER, bBecomes: FLOWER, chance: 0.02,
+    discovery: { name: 'Sprout!', science: 'Seeds drink up water to sprout and grow. Plants build themselves mostly out of water and air!' } },
+  { a: TREE, b: WATER, aBecomes: TREE, bBecomes: TREE, chance: 0.02,
     discovery: { name: 'Sprout!', science: 'Seeds drink up water to sprout and grow. Plants build themselves mostly out of water and air!' } },
   { a: LAVA, b: ICE, aBecomes: LAVA, bBecomes: WATER, chance: 0.8,
     discovery: { name: 'Melting', science: 'Heat makes the molecules in ice jiggle faster and faster until they break loose and flow — that is melting!' } },
@@ -144,7 +170,7 @@ export const REACTIONS: Reaction[] = [
     discovery: { name: 'Melting', science: 'Heat makes the molecules in ice jiggle faster and faster until they break loose and flow — that is melting!' } },
   { a: LAVA, b: SNOW, aBecomes: LAVA, bBecomes: WATER, chance: 0.8,
     discovery: { name: 'Melting', science: 'Heat makes the molecules in ice jiggle faster and faster until they break loose and flow — that is melting!' } },
-  { a: SEED, b: DIRT, aBecomes: PLANT, bBecomes: DIRT, chance: 1,
+  { a: SEED, b: DIRT, aBecomes: SPROUT_OUTCOMES, bBecomes: DIRT, chance: 1,
     discovery: { name: 'Sprout!', science: 'Seeds drink up water to sprout and grow. Plants build themselves mostly out of water and air!' } },
 ];
 

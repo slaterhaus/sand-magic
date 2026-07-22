@@ -29,6 +29,7 @@ describe('element definitions', () => {
         if (typeof outcome === 'number') {
           expect(ELEMENTS[outcome]).toBeDefined();
         } else {
+          expect(outcome.length).toBeGreaterThan(0);
           for (const o of outcome) {
             expect(ELEMENTS[o.into]).toBeDefined();
             expect(o.weight).toBeGreaterThan(0);
