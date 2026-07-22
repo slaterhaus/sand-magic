@@ -61,6 +61,21 @@ describe('plant variety on sprouting', () => {
     expect(g.get(2, 0)).toBe(DIRT);
   });
 
+  it('resolves correctly through the mirrored rule too (water scanned before the seed)', () => {
+    // stepReactions scans left-to-right/top-to-bottom and checks each cell's
+    // right+down neighbor, so placing WATER before SEED in scan order makes
+    // tryReact see (a=WATER, b=SEED) — the auto-mirrored rule, where
+    // SPROUT_OUTCOMES sits in bBecomes rather than aBecomes. This pins that
+    // the array form works from both slots, not just the one every other
+    // test in this file happens to exercise.
+    const g = new Grid(4, 2);
+    g.set(1, 0, WATER);
+    g.set(2, 0, SEED);
+    stepReactions(g, new Set(), () => {}, () => 0);
+    expect(g.get(2, 0)).toBe(GRASS);
+    expect(g.get(1, 0)).toBe(WATER);
+  });
+
   it('the Sprout! discovery still fires exactly once regardless of which variant resulted', () => {
     const g = new Grid(4, 2);
     g.set(1, 0, SEED);
