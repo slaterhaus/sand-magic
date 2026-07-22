@@ -18,6 +18,12 @@ export const ICE = 10;
 export const OIL = 11;
 export const ASH = 12;
 export const OBSIDIAN = 13;
+export const SNOW = 14;
+export const METAL = 15;
+export const DIRT = 16;
+export const ACID = 17;
+export const GLASS = 18;
+export const RUST = 19;
 
 // How an element moves:
 //  static = never moves (stone, wood, ice...)
@@ -68,6 +74,12 @@ export const ELEMENTS: Record<ElementId, ElementDef> = {
   [OIL]:      { id: OIL, name: 'Oil', colors: ['#4b3a5a', '#544166'], phase: 'liquid', density: 900 },
   [ASH]:      { id: ASH, name: 'Ash', colors: ['#9b9b93', '#8f8f88'], phase: 'powder', density: 700 },
   [OBSIDIAN]: { id: OBSIDIAN, name: 'Obsidian', colors: ['#2b2733', '#342f3f'], phase: 'static', density: 9999 },
+  [SNOW]:     { id: SNOW, name: 'Snow', colors: ['#f5fbff', '#eaf4fb'], phase: 'powder', density: 800 },
+  [METAL]:    { id: METAL, name: 'Metal', colors: ['#a8adb5', '#9aa0a8'], phase: 'static', density: 9999 },
+  [DIRT]:     { id: DIRT, name: 'Dirt', colors: ['#5a4230', '#4e3828'], phase: 'powder', density: 1400 },
+  [ACID]:     { id: ACID, name: 'Acid', colors: ['#7ee62c', '#6fd420'], phase: 'liquid', density: 1050 },
+  [GLASS]:    { id: GLASS, name: 'Glass', colors: ['#bcd6d6', '#a9c9c9'], phase: 'static', density: 9999 },
+  [RUST]:     { id: RUST, name: 'Rust', colors: ['#8a4a2a', '#7a3f22'], phase: 'static', density: 9999 },
 };
 
 // When element `a` touches element `b`, `a` becomes `aBecomes` and
@@ -106,7 +118,28 @@ export const REACTIONS: Reaction[] = [
     discovery: { name: 'Melting', science: 'Heat makes the molecules in ice jiggle faster and faster until they break loose and flow — that is melting!' } },
   { a: STEAM, b: ICE, aBecomes: WATER, bBecomes: ICE, chance: 0.3,
     discovery: { name: 'Rain Maker', science: 'When steam cools down it condenses back into drops of water. That is exactly how clouds make rain!' } },
+  { a: FIRE, b: SAND, aBecomes: FIRE, bBecomes: GLASS, chance: 0.03,
+    discovery: { name: 'Glass!', science: 'Sand is mostly a mineral called silica — enough heat melts it into glass, the same way glassblowers make bottles and windows.' } },
+  { a: LAVA, b: SAND, aBecomes: LAVA, bBecomes: GLASS, chance: 0.03,
+    discovery: { name: 'Glass!', science: 'Sand is mostly a mineral called silica — enough heat melts it into glass, the same way glassblowers make bottles and windows.' } },
+  { a: METAL, b: WATER, aBecomes: RUST, bBecomes: WATER, chance: 0.01,
+    discovery: { name: 'Rusty!', science: 'When metal sits in water a long time, it slowly reacts with the air and water to form rust — a new, weaker material. That is why old ships and playground equipment turn orange-brown.' } },
+  { a: ACID, b: STONE, aBecomes: ACID, bBecomes: EMPTY, chance: 0.05,
+    discovery: { name: 'Dissolved!', science: 'Acid is a liquid that can slowly break the bonds holding a solid together, eating through it bit by bit. Strong acids can dissolve rock over hundreds of years — it is how some caves form!' } },
+  { a: ACID, b: WOOD, aBecomes: ACID, bBecomes: EMPTY, chance: 0.05,
+    discovery: { name: 'Dissolved!', science: 'Acid is a liquid that can slowly break the bonds holding a solid together, eating through it bit by bit. Strong acids can dissolve rock over hundreds of years — it is how some caves form!' } },
+  { a: ACID, b: METAL, aBecomes: ACID, bBecomes: EMPTY, chance: 0.05,
+    discovery: { name: 'Dissolved!', science: 'Acid is a liquid that can slowly break the bonds holding a solid together, eating through it bit by bit. Strong acids can dissolve rock over hundreds of years — it is how some caves form!' } },
+  { a: FIRE, b: SNOW, aBecomes: FIRE, bBecomes: WATER, chance: 0.3,
+    discovery: { name: 'Melting', science: 'Heat makes the molecules in ice jiggle faster and faster until they break loose and flow — that is melting!' } },
+  { a: LAVA, b: SNOW, aBecomes: LAVA, bBecomes: WATER, chance: 0.8,
+    discovery: { name: 'Melting', science: 'Heat makes the molecules in ice jiggle faster and faster until they break loose and flow — that is melting!' } },
+  { a: SEED, b: DIRT, aBecomes: PLANT, bBecomes: DIRT, chance: 1,
+    discovery: { name: 'Sprout!', science: 'Seeds drink up water to sprout and grow. Plants build themselves mostly out of water and air!' } },
 ];
 
 // Which elements show up in the paint palette (the eraser is added by the UI).
-export const BRUSH_ELEMENTS: ElementId[] = [SAND, WATER, STONE, WOOD, SEED, ICE, OIL, LAVA, FIRE];
+export const BRUSH_ELEMENTS: ElementId[] = [
+  SAND, WATER, STONE, WOOD, SEED, ICE, OIL, LAVA, FIRE,
+  SNOW, METAL, DIRT, ACID,
+];

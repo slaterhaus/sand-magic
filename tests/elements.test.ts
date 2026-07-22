@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { BRUSH_ELEMENTS, ELEMENTS, EMPTY, REACTIONS } from '../src/elements';
+import {
+  ACID, BRUSH_ELEMENTS, DIRT, ELEMENTS, EMPTY, GLASS, LAVA,
+  METAL, OIL, REACTIONS, RUST, SAND, SNOW, STONE, WATER, WOOD,
+} from '../src/elements';
 
 describe('element definitions', () => {
   it('every record key matches its def id', () => {
@@ -32,5 +35,27 @@ describe('element definitions', () => {
       expect(ELEMENTS[id]).toBeDefined();
       expect(id).not.toBe(EMPTY);
     }
+  });
+
+  it('new liquid/powder densities are ordered as designed', () => {
+    // snow < oil < water < acid < dirt < sand < lava
+    expect(ELEMENTS[SNOW].density).toBeLessThan(ELEMENTS[OIL].density);
+    expect(ELEMENTS[OIL].density).toBeLessThan(ELEMENTS[WATER].density);
+    expect(ELEMENTS[WATER].density).toBeLessThan(ELEMENTS[ACID].density);
+    expect(ELEMENTS[ACID].density).toBeLessThan(ELEMENTS[DIRT].density);
+    expect(ELEMENTS[DIRT].density).toBeLessThan(ELEMENTS[SAND].density);
+    expect(ELEMENTS[SAND].density).toBeLessThan(ELEMENTS[LAVA].density);
+  });
+
+  it('glass and rust are discovery-only, not paintable', () => {
+    expect(BRUSH_ELEMENTS).not.toContain(GLASS);
+    expect(BRUSH_ELEMENTS).not.toContain(RUST);
+  });
+
+  it('acid only reacts with stone, wood, and metal — not water, sand, or living things', () => {
+    const acidPartners = REACTIONS
+      .filter(r => r.a === ACID || r.b === ACID)
+      .map(r => (r.a === ACID ? r.b : r.a));
+    expect(new Set(acidPartners)).toEqual(new Set([STONE, WOOD, METAL]));
   });
 });
