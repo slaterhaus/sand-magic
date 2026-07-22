@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   ACID, BRUSH_ELEMENTS, DIRT, ELEMENTS, EMPTY, GLASS, LAVA,
   METAL, OIL, REACTIONS, RUST, SAND, SNOW, STONE, WATER, WOOD,
+  type WeightedOutcome,
 } from '../src/elements';
 
 describe('element definitions', () => {
@@ -21,8 +22,18 @@ describe('element definitions', () => {
   it('reactions only reference defined elements and have valid chances', () => {
     expect(REACTIONS.length).toBeGreaterThan(0);
     for (const r of REACTIONS) {
-      for (const id of [r.a, r.b, r.aBecomes, r.bBecomes]) {
+      for (const id of [r.a, r.b]) {
         expect(ELEMENTS[id]).toBeDefined();
+      }
+      for (const outcome of [r.aBecomes, r.bBecomes]) {
+        if (typeof outcome === 'number') {
+          expect(ELEMENTS[outcome]).toBeDefined();
+        } else {
+          for (const o of outcome) {
+            expect(ELEMENTS[o.into]).toBeDefined();
+            expect(o.weight).toBeGreaterThan(0);
+          }
+        }
       }
       expect(r.chance).toBeGreaterThan(0);
       expect(r.chance).toBeLessThanOrEqual(1);

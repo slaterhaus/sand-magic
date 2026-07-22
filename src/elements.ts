@@ -85,11 +85,21 @@ export const ELEMENTS: Record<ElementId, ElementDef> = {
 // When element `a` touches element `b`, `a` becomes `aBecomes` and
 // `b` becomes `bBecomes` — with probability `chance` per frame.
 // A `discovery` shows up in the journal the FIRST time it ever happens.
+//
+// aBecomes/bBecomes are usually a single fixed element. For an outcome
+// that should be a surprise — like which kind of plant a seed grows
+// into — use a WeightedOutcome[] instead: a list of {into, weight}
+// picks, resolved once each time the reaction fires.
+export interface WeightedOutcome {
+  into: ElementId;
+  weight: number;
+}
+
 export interface Reaction {
   a: ElementId;
   b: ElementId;
-  aBecomes: ElementId;
-  bBecomes: ElementId;
+  aBecomes: ElementId | WeightedOutcome[];
+  bBecomes: ElementId | WeightedOutcome[];
   chance: number;
   discovery?: { name: string; science: string };
 }

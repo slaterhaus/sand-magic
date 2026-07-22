@@ -1,4 +1,4 @@
-import { ELEMENTS, EMPTY, REACTIONS } from '../elements';
+import { ELEMENTS, EMPTY, REACTIONS, type ElementId, type WeightedOutcome } from '../elements';
 import type { Grid } from './grid';
 import type { Rng } from './physics';
 
@@ -11,8 +11,8 @@ export interface Discovery {
 export type DiscoveryListener = (d: Discovery) => void;
 
 interface Rule {
-  aBecomes: number;
-  bBecomes: number;
+  aBecomes: ElementId | WeightedOutcome[];
+  bBecomes: ElementId | WeightedOutcome[];
   chance: number;
   discovery?: { name: string; science: string };
   swatches: [string, string];
@@ -47,6 +47,17 @@ export function stepReactions(
   }
 }
 
+function resolveOutcome(outcome: ElementId | WeightedOutcome[], random: Rng): ElementId {
+  if (typeof outcome === 'number') return outcome;
+  const total = outcome.reduce((sum, o) => sum + o.weight, 0);
+  let roll = random() * total;
+  for (const o of outcome) {
+    if (roll < o.weight) return o.into;
+    roll -= o.weight;
+  }
+  return outcome[outcome.length - 1].into; // floating-point fallback
+}
+
 function tryReact(
   grid: Grid, x: number, y: number, nx: number, ny: number,
   seen: Set<string>, onDiscovery: DiscoveryListener, random: Rng,
@@ -56,8 +67,8 @@ function tryReact(
   if (a === EMPTY || b === EMPTY) return;
   const rule = RULES.get(pairKey(a, b));
   if (!rule || random() >= rule.chance) return;
-  grid.set(x, y, rule.aBecomes);
-  grid.set(nx, ny, rule.bBecomes);
+  grid.set(x, y, resolveOutcome(rule.aBecomes, random));
+  grid.set(nx, ny, resolveOutcome(rule.bBecomes, random));
   if (rule.discovery && !seen.has(rule.discovery.name)) {
     onDiscovery({ ...rule.discovery, swatches: rule.swatches });
   }
